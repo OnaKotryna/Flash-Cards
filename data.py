@@ -1,8 +1,19 @@
 import pandas as pd
+import random
+import os
 
 
-csv_data = "./data/de_1k.csv"
-df = pd.read_csv(csv_data)
+WORDS_TO_LEARN_FILE = "./data/words_to_learn.csv"
+ALL_WORDS = "./data/de_1k.csv"
+
+try:
+    df = pd.read_csv(WORDS_TO_LEARN_FILE)  
+    print(df) 
+except FileNotFoundError:
+    df = pd.read_csv(ALL_WORDS)
+finally:
+    df = df.head(10)
+    word_data = df.to_dict(orient="records")
 
 
 def get_languages():
@@ -10,5 +21,23 @@ def get_languages():
 
 
 def get_word():
-    words = df.sample(n=1)
-    return words.to_dict(orient="records")[0]
+    try:
+        return random.choice(word_data)
+    except IndexError:
+        return None
+
+
+def remove_word(word):
+    global word_data
+    word_data.remove(word)
+    save_words()
+
+
+def save_words():
+    global word_data
+    if word_data:
+        df = pd.DataFrame(word_data)
+        df.to_csv(WORDS_TO_LEARN_FILE, index=False)
+    else:
+        os.remove(WORDS_TO_LEARN_FILE)
+        

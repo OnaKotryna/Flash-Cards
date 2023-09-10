@@ -1,6 +1,6 @@
 from tkinter import *
 
-from data import get_languages, get_word
+from data import get_languages, get_word, remove_word
 
 
 BG_COLOR="#B1DDC6"
@@ -10,7 +10,9 @@ IMG_HEIGHT=526
 languages = get_languages()
 ORIGIN_LANGUAGE=languages[0]
 TRANSLATION_LANGUAGE=languages[1]
+current_word = {}
 timer_id = None
+
 # ---------------------- BUTTON ACTIONS ----------------------
 def set_card(type, language, word):
     match type:
@@ -28,15 +30,23 @@ def set_card(type, language, word):
     
 
 def next_card():
-    global timer_id
+    global timer_id, current_word
     if timer_id:
         window.after_cancel(timer_id)
-    new_word = get_word()
-    set_card("front", ORIGIN_LANGUAGE, new_word[ORIGIN_LANGUAGE])
-    timer_id = window.after(3000, flip_card, new_word[TRANSLATION_LANGUAGE])
+    current_word = get_word()
+    if current_word:
+        set_card("front", ORIGIN_LANGUAGE, current_word[ORIGIN_LANGUAGE])
+        timer_id = window.after(3000, flip_card, current_word[TRANSLATION_LANGUAGE])
+    else:
+        window.quit()
 
 def flip_card(word):
     set_card("back", TRANSLATION_LANGUAGE, word)
+
+
+def remove_known_word():
+    remove_word(current_word)
+    next_card()
 
 # ---------------------------- UI ----------------------------
 window = Tk()
@@ -57,7 +67,7 @@ btn_wrong = Button(image=img_wrong, highlightthickness=0, bd=0, command=next_car
 btn_wrong.grid(row=1, column=0)
 
 img_right = PhotoImage(file="./images/right.png")
-btn_rigth = Button(image=img_right, highlightthickness=0, bd=0, command=next_card)
+btn_rigth = Button(image=img_right, highlightthickness=0, bd=0, command=remove_known_word)
 btn_rigth.grid(row=1, column=1)
 
 next_card()
