@@ -8,11 +8,10 @@ ALL_WORDS = "./data/de_1k.csv"
 
 try:
     df = pd.read_csv(WORDS_TO_LEARN_FILE)  
-    print(df) 
 except FileNotFoundError:
     df = pd.read_csv(ALL_WORDS)
 finally:
-    df = df.head(10)
+    df = df.head(100)
     word_data = df.to_dict(orient="records")
 
 
@@ -40,4 +39,3 @@ def save_words():
         df.to_csv(WORDS_TO_LEARN_FILE, index=False)
     else:
         os.remove(WORDS_TO_LEARN_FILE)
-        
