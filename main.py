@@ -10,17 +10,33 @@ IMG_HEIGHT=526
 languages = get_languages()
 ORIGIN_LANGUAGE=languages[0]
 TRANSLATION_LANGUAGE=languages[1]
-
+timer_id = None
 # ---------------------- BUTTON ACTIONS ----------------------
-def set_card(language, word):
-    canvas.itemconfig(text_language, text=language)
-    canvas.itemconfig(text_word, text=word)
+def set_card(type, language, word):
+    match type:
+        case "front":
+            text_fill = "black"
+            card_image = CARD_FRONT
+        case "back":
+            text_fill = "white"
+            card_image = CARD_BACK
+        case _:
+            pass
+    canvas.itemconfig(text_language, text=language, fill=text_fill)
+    canvas.itemconfig(text_word, text=word, fill=text_fill)
+    canvas.itemconfig(img_card, image=card_image)
     
 
 def next_card():
+    global timer_id
+    if timer_id:
+        window.after_cancel(timer_id)
     new_word = get_word()
-    set_card(ORIGIN_LANGUAGE, new_word[0][languages[0]])
+    set_card("front", ORIGIN_LANGUAGE, new_word[ORIGIN_LANGUAGE])
+    timer_id = window.after(3000, flip_card, new_word[TRANSLATION_LANGUAGE])
 
+def flip_card(word):
+    set_card("back", TRANSLATION_LANGUAGE, word)
 
 # ---------------------------- UI ----------------------------
 window = Tk()
@@ -28,8 +44,9 @@ window.title("Flash Cards")
 window.config(padx=50, pady=50, bg=BG_COLOR)
 
 canvas = Canvas(width=IMG_WIDTH, height=IMG_HEIGHT, highlightthickness=0, bg=BG_COLOR)
-card_front = PhotoImage(file="./images/card_front.png")
-canvas.create_image(IMG_WIDTH/2, IMG_HEIGHT/2, image=card_front)
+CARD_FRONT = PhotoImage(file="./images/card_front.png")
+CARD_BACK = PhotoImage(file="./images/card_back.png")
+img_card = canvas.create_image(IMG_WIDTH/2, IMG_HEIGHT/2, image=CARD_FRONT)
 canvas.grid(row=0, column=0, columnspan=2)
 
 text_language = canvas.create_text(400, 150, text="", font=("Arial", 40, "italic"))
