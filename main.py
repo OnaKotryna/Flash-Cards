@@ -2,7 +2,7 @@ from tkinter import *
 
 from data import get_languages, get_word, remove_word
 
-
+# -------------- CONSTANTS AND GLBOAL VARIABLES --------------
 BG_COLOR="#B1DDC6"
 IMG_WIDTH=800
 IMG_HEIGHT=526
@@ -15,6 +15,7 @@ timer_id = None
 
 # ---------------------- BUTTON ACTIONS ----------------------
 def set_card(type, language, word):
+    '''Set the card to specified type.'''
     match type:
         case "front":
             text_fill = "black"
@@ -30,6 +31,7 @@ def set_card(type, language, word):
     
 
 def next_card():
+    '''Get the next card.'''
     global timer_id, current_word
     if timer_id:
         window.after_cancel(timer_id)
@@ -41,10 +43,12 @@ def next_card():
         window.quit()
 
 def flip_card(word):
+    '''Flip the card'''
     set_card("back", TRANSLATION_LANGUAGE, word)
 
 
 def remove_known_word():
+    '''Remove known word.'''
     remove_word(current_word)
     next_card()
 
@@ -53,23 +57,28 @@ window = Tk()
 window.title("Flash Cards")
 window.config(padx=50, pady=50, bg=BG_COLOR)
 
+# Card background
 canvas = Canvas(width=IMG_WIDTH, height=IMG_HEIGHT, highlightthickness=0, bg=BG_COLOR)
 CARD_FRONT = PhotoImage(file="./images/card_front.png")
 CARD_BACK = PhotoImage(file="./images/card_back.png")
 img_card = canvas.create_image(IMG_WIDTH/2, IMG_HEIGHT/2, image=CARD_FRONT)
 canvas.grid(row=0, column=0, columnspan=2)
 
+# Card text
 text_language = canvas.create_text(400, 150, text="", font=("Arial", 40, "italic"))
 text_word = canvas.create_text(400, 263, text="", font=("Arial", 60, "bold"))
 
+# Button to indicate that the word is not learned
 img_wrong = PhotoImage(file="./images/wrong.png")
 btn_wrong = Button(image=img_wrong, highlightthickness=0, bd=0, command=next_card)
 btn_wrong.grid(row=1, column=0)
 
+# Button to indicate that the word is learned
 img_right = PhotoImage(file="./images/right.png")
 btn_rigth = Button(image=img_right, highlightthickness=0, bd=0, command=remove_known_word)
 btn_rigth.grid(row=1, column=1)
 
+# Get the first card
 next_card()
 
 window.mainloop()
