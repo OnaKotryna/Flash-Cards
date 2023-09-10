@@ -11,4 +11,4 @@ def get_languages():
 
 def get_word():
     words = df.sample(n=1)
-    return words.to_dict(orient="records")
+    return words.to_dict(orient="records")[0]
